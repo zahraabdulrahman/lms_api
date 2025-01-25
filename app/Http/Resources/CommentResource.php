@@ -24,8 +24,8 @@ class CommentResource extends JsonResource
                 'end_date' => $this->course->end_date,
             ],
             'student' => [
-                'id' => $this->student->id,
-                'name' => $this->student->name,
+                'id' => $this->user->id,
+                'name' => $this->user->name,
             ],
             'created_at' => $this->created_at->toDateTimeString(),
             'updated_at' => $this->updated_at->toDateTimeString(),

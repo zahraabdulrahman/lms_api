@@ -8,10 +8,12 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\AuthController;
 
-/* //register and login
-Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']); */
-
+Route::controller(AuthController::class)->group(function(){
+    Route::post('register', 'register');
+    Route::post('login', 'login');
+    //logout route is protected, as only logged in users can use it
+    Route::post('logout', 'logout')->middleware('auth:sanctum');
+});
 
 Route::prefix('courses/{course}')->group(function () {
     Route::get('comments', [CommentController::class, 'index'])->name('courses.comments.index');
@@ -22,4 +24,4 @@ Route::prefix('courses/{course}')->group(function () {
 
 Route::apiResource('student', UserController::class);
 Route::apiResource('courses', CourseController::class);
-Route::apiResource('registrations', RegistrationController::class);
+Route::apiResource('registrations', RegistrationController::class)->middleware('auth:sanctum');

@@ -4,8 +4,19 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Http\Resources\CommentResource;
-class CommentController extends Controller
+use App\Models\Course;
+use App\Models\User;
+use App\Models\Comment;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+
+class CommentController extends Controller implements HasMiddleware
 {
+    public static function middleware(){
+        return [
+            new Middleware('auth:sanctum')
+        ];
+    }
 
     public function store(Request $request, Course $course)
     {
@@ -13,6 +24,7 @@ class CommentController extends Controller
             'comment' => 'required|string|max:250',
         ]);
 
+        $user = $request->user();
         $comment = new Comment();
         $comment->comment = $validatedData['comment'];
         $comment->user_id = $user->id;

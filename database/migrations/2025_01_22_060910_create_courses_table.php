@@ -19,6 +19,7 @@ return new class extends Migration
             $table->date('end_date');
             $table->string('details')->nullable();
             $table->string('instructor_name', 250);
+            $table->softDeletes();
             $table->timestamps();
         });
     }

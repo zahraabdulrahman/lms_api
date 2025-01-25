@@ -10,7 +10,10 @@ use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    protected $fillable = ['name', 'price', 'start_date', 'end_date', 'details', 'instructor_name'];
+    use HasApiTokens;
+
+    protected $fillable = ['name', 'email', 'password', 'role', 'price', 
+    'start_date', 'end_date', 'details', 'instructor_name', 'role'];
 
     public function registrations(){
         return $this->hasMany(Registration::class);

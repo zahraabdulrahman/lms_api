@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Http\Resources\CourseResource;
+use App\Models\Course; // Correct: Capital 'M' in Models
 
 class CourseController extends Controller
 {
@@ -16,7 +17,7 @@ class CourseController extends Controller
             'start_date' => 'required|date',
             'end_date' => 'required|date',
             'details' => 'nullable|string',
-            'instructor_name' => 'required|string|nax:250'
+            'instructor_name' => 'required|string|max:250'
         ]); //validating the data
 
         Course::create($validated_data); //creation of the course

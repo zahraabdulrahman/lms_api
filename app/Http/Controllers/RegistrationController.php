@@ -4,12 +4,22 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Http\Resources\RegistrationResource;
+use App\Models\Course;
+use App\Models\User;
+use App\Models\Registration;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class RegistrationController extends Controller
+class RegistrationController extends Controller implements HasMiddleware
 {
 
+    public static function middleware(){
+        return [
+            new Middleware('auth:sanctum')
+        ];
+    }
     public function index(Request $request){
-        $query = Registeration::query();
+        $query = Registration::query();
 
         //filtering by student id if the request has it
         if($request->has('user_id')){
@@ -54,16 +64,16 @@ class RegistrationController extends Controller
         }
 
         //checking if the student is already registered to the course
-        $registration_exists = Registeration::where('user_id', $validated['user_id'])->where('course_id', $validated['course_id'])->exists();
+        $registration_exists = Registration::where('user_id', $validated['user_id'])->where('course_id', $validated['course_id'])->exists();
         
         if ($registration_exists){
             return response()->json(['message' => 'The student is already registered for this course.'], 400);
         }
 
-        $registration = Registration::create([
+        $registration = $request->user()->registrations()->Registration::create([
             'user_id' => $validated['user_id'],
             'course_id' => $validated['course_id'],
-        ]);
+        ]); //only auth students(users for now) can create registerations
 
         return response()->json(['message'=>'Registration created successfully'], 201);
     }
