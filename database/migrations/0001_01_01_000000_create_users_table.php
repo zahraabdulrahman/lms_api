@@ -15,14 +15,14 @@ return new class extends Migration
 
             $table->id();
             $table->string('name');
-            $table->string('email')->unique(); //email has to be uniqu
+            $table->string('email')->unique(); //email has to be unique
             $table->string('password'); 
             $table->decimal('price', 8, 2)->nullable(); 
             $table->date('start_date')->nullable(); 
             $table->date('end_date')->nullable(); 
             $table->text('details')->nullable();
             $table->string('instructor_name')->nullable(); 
-            $table->string('role')->default('student'); //add role
+            $table->enum('role', ['student', 'instructor', 'admin'])->default('student');  //role is added
             $table->timestamps();
         });
     }

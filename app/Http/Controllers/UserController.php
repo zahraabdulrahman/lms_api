@@ -50,5 +50,14 @@ class UserController extends Controller
 
         return response()->json(new StudentResource($user), 200);
     }
+
+    public function destroy(Request $request, User $user)
+    {
+        $this->authorize('delete', $user); // Check if the authenticated user can delete the given user
+
+        $user->delete();
+
+        return response()->json(['message' => 'Student deleted successfully'], 200);
+    }
     
 }

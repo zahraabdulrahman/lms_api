@@ -10,15 +10,12 @@ use App\Models\Registration;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 
-class RegistrationController extends Controller implements HasMiddleware
+class RegistrationController extends Controller
 {
 
-    public static function middleware(){
-        return [
-            new Middleware('auth:sanctum')
-        ];
-    }
     public function index(Request $request){
+        $this->authorize('viewAny', Registration::class); //checks if user if authorized
+
         $query = Registration::query();
 
         //filtering by student id if the request has it
@@ -45,6 +42,8 @@ class RegistrationController extends Controller implements HasMiddleware
 
     public function show($id) //show a specific registration
     {
+        $this->authorize('view', $registration);
+
         $registration = Registration::findOrFail($id);
 
         return RegistrationResource($registration);

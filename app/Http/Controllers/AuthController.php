@@ -41,6 +41,7 @@ class AuthController extends Controller
             'end_date' => 'nullable|date',
             'details' => 'nullable|string',
             'instructor_name' => 'nullable|string|max:255',
+            'role' => 'required|in:student,instructor,admin'
         ]);
 
         $validated['password'] = bcrypt($validated['password']); //crypt the password
