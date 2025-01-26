@@ -6,6 +6,7 @@ use App\Http\Controllers\CommentController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\EmailController;
 
 Route::controller(AuthController::class)->group(function () {
     Route::post('register', 'register');
@@ -37,4 +38,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Students (delete action only)
     Route::delete('/students/{user}', [UserController::class, 'destroy'])->middleware('can:delete,user');
+
+    // Email
+    Route::get('/send_email', [EmailController::class, 'sendUserEmail']);
 });
