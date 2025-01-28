@@ -3,13 +3,12 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-cclass YourEmail extends Mailable
+class YourEmail extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -30,7 +29,7 @@ cclass YourEmail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.self_email', 
+            view: 'emails.self_email',
             with: [
                 'body' => $this->emailData['body'] ?? 'Default body',
             ]

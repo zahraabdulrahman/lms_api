@@ -4,14 +4,23 @@ namespace App\Policies;
 
 use App\Models\Course;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class CoursePolicy
 {
     use HandlesAuthorization;
 
-     //only admin and instructor can update the course
+    public function viewAny(User $user)
+    {
+        return in_array($user->role, ['admin', 'instructor', 'student']);
+    }
+
+    public function view(User $user, Course $course)
+    {
+        return in_array($user->role, ['admin', 'instructor', 'student']);
+    }
+
+    // only admin and instructor can update the course
     public function update(User $user, Course $course)
     {
         return in_array($user->role, ['admin', 'instructor']);
@@ -21,7 +30,7 @@ class CoursePolicy
     {
         return in_array($user->role, ['admin', 'instructor']); // Only admin and instructor
     }
-  
+
     /**
      * Determine whether the user can delete the model.
      */
@@ -29,5 +38,4 @@ class CoursePolicy
     {
         return $user->role === 'admin'; // Only admin can delete
     }
-
 }

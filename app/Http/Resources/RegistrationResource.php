@@ -16,10 +16,8 @@ class RegistrationResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'student_id' => $this->student_id,
+            'user_id' => $this->user_id,
             'course_id' => $this->course_id,
-            'student_name' => $this->student->name, // Assuming you have a 'name' field on the Student model
-            'course_title' => $this->course->title, // Assuming you have a 'title' field on the Course model
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

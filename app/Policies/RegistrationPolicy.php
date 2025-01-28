@@ -4,17 +4,26 @@ namespace App\Policies;
 
 use App\Models\Registration;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class RegistrationPolicy
 {
-    
     use HandlesAuthorization;
 
     public function viewAny(User $user)
     {
-        return in_array($user->role, ['admin', 'instructor']); // Only admin or instructor can view all registrations
+        // Admins/instructors can view all registrations
+        if (in_array($user->role, ['admin', 'instructor'])) {
+            return true;
+        }
+
+        // Students can only view their own registrations
+        return $user->role === 'student' && (
+            // Allow if no user_id is specified
+            ! request()->has('user_id') ||
+            // Allow if user_id matches their own ID
+            request('user_id') == $user->id
+        );
     }
 
     public function view(User $user, Registration $registration)

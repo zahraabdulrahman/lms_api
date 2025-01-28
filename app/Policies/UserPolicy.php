@@ -3,14 +3,26 @@
 namespace App\Policies;
 
 use App\Models\User;
-use Illuminate\Auth\Access\HandlesAuthorization;
 
 class UserPolicy
 {
-    use HandlesAuthorization;
-
-    public function delete(User $authUser, User $userToDelete)
+    public function createStudent(User $user)
     {
-        return $authUser->role === 'admin' && $userToDelete->role === 'student';
-    } //only admins can delete students
+        return $user->isAdmin();
+    }
+
+    public function view(User $authUser, User $targetUser)
+    {
+        return $authUser->isAdmin() || $authUser->id === $targetUser->id;
+    }
+
+    public function update(User $authUser, User $targetUser)
+    {
+        return $authUser->isAdmin() || $authUser->id === $targetUser->id;
+    }
+
+    public function delete(User $authUser, User $targetUser)
+    {
+        return $authUser->isAdmin();
+    }
 }

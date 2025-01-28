@@ -23,15 +23,15 @@ class CourseController extends Controller
 
         $course = Course::create($validated_data);
 
-        return response()->json(['message' => "Course created successfully", 'course' => $course], 201);
+        return new CourseResource($course);
     }
 
-    public function update(Request $request, Course $course) // Type-hint the Course model
+    public function update(Request $request, Course $course)
     {
-        $this->authorize('update', $course); // Correct authorization
+        $this->authorize('update', $course);
 
         $validated_data = $request->validate([
-            'title' => 'nullable|string|max:250',
+            'title' => 'required|string|max:250',
             'price' => 'nullable|numeric',
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date',
@@ -41,15 +41,17 @@ class CourseController extends Controller
 
         $course->update($validated_data);
 
-        return response()->json(['message' => "Updated successfully", 'course' => $course], 200);
+        return new CourseResource($course);
     }
 
     public function index(Request $request)
     {
+        $this->authorize('viewAny', Course::class);
+
         $query = Course::query();
 
         if ($request->has('title')) {
-            $query->where('title', 'like', '%' . $request->title . '%');
+            $query->where('title', 'like', '%'.$request->title.'%');
         }
 
         if ($request->has('start_date')) {
@@ -57,29 +59,27 @@ class CourseController extends Controller
         }
 
         if ($request->has('instructor_name')) {
-            $query->where('instructor_name', 'like', '%' . $request->instructor_name . '%');
+            $query->where('instructor_name', 'like', '%'.$request->instructor_name.'%');
         }
 
         $courses = $query->paginate(10);
 
-        if ($courses->isEmpty()) {
-            return response()->json(['message' => 'No courses found'], 404);
-        }
-
         return CourseResource::collection($courses);
     }
 
-    public function show(Course $course) // Route Model Binding
+    public function show(Course $course)
     {
-        return response()->json(new CourseResource($course), 200);
+        $this->authorize('view', $course);
+
+        return new CourseResource($course);
     }
 
-    public function destroy(Course $course) // Type-hint the Course model
+    public function destroy(Course $course)
     {
-        $this->authorize('delete', $course); // Correct authorization
-
+        $this->authorize('delete', $course);
+        // authroize before allowing deletion
         $course->delete();
 
-        return response()->json(['message' => "Course deleted successfully"], 200);
+        return response()->noContent();
     }
 }

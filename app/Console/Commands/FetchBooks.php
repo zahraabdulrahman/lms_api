@@ -10,8 +10,9 @@ use Illuminate\Support\Facades\Log; // Import Log facade
 class FetchBooks extends Command
 {
     protected $signature = 'app:fetch-books';
+
     protected $description = 'Fetch books from the Fake Books API and store them in the database.';
-    
+
     public function handle()
     {
         try {
@@ -49,7 +50,7 @@ class FetchBooks extends Command
                 $this->error('Failed to fetch books from the API.');
             }
         } catch (\Exception $e) {
-            Log::error('Error fetching books: ' . $e->getMessage());
+            Log::error('Error fetching books: '.$e->getMessage());
             $this->error('An error occurred while fetching books.');
         }
     }

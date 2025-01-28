@@ -2,62 +2,90 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\User; 
 use App\Http\Resources\StudentResource;
+use App\Models\User;
+use App\Models\StudentProfile;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
+    // Create a new student (admin only)
+    public function store(Request $request)
+    {
+        $this->authorize('create-student', User::class);
 
-    public function store(Request $request){ //creating a new student
-        $validate_data = $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:250',
+            'email' => 'required|email|unique:users',
+            'password' => 'required|string|min:8',
             'price' => 'required|numeric',
             'start_date' => 'required|date',
-            'end_date' => 'required|date',
+            'end_date' => 'required|date|after:start_date',
             'details' => 'nullable|string',
-            'instructor_name' => 'required|string|max:250',
-        ]); //validate data
+        ]);
 
-        User::create($validate_data); //create the student
+        $user = User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => bcrypt($validated['password']),
+            'role' => 'student'
+        ]);
 
-        return response()->json(["message" => "Student created successfully"], 201);
+        $user->studentProfile()->create([
+            'price' => $validated['price'],
+            'start_date' => $validated['start_date'],
+            'end_date' => $validated['end_date'],
+            'details' => $validated['details']
+        ]);
+
+        return new StudentResource($user->load('studentProfile'));
     }
 
-    public function update(Request $request, string $id) //updating a student
+    // Update user (admin or own profile)
+    public function update(Request $request, User $user)
     {
-        $user = User::findOrFail($id); // if not found returns error
+        $this->authorize('update', $user);
 
-        $validated_data = $request->validate(
-            [
-                'name' => 'required|string|max:250',
-                'price' => 'required|numeric',
-                'start_date' => 'required|date',
-                'end_date' => 'required|date',
-                'details' => 'nullable|string',
-                'instructor_name' => 'required|string|max:250',
-            ]
-        );//validate data
-    
-        $user->update($validated_data);
+        $validated = $request->validate([
+            'name' => 'sometimes|string|max:250',
+            'email' => ['sometimes','email', Rule::unique('users')->ignore($user->id)],
+            'password' => 'sometimes|string|min:8',
+            'price' => 'sometimes|numeric',
+            'start_date' => 'sometimes|date',
+            'end_date' => 'sometimes|date|after:start_date',
+            'details' => 'nullable|string',
+        ]);
 
-        return response()->json(["message" => "Student updated successfully"], 200);
+        // Update base user
+        $user->update($validated);
+
+        // Update student profile if exists
+        if ($user->isStudent() && $user->studentProfile) {
+            $user->studentProfile()->update($request->only([
+                'price', 'start_date', 'end_date', 'details'
+            ]));
+        }
+
+        return new StudentResource($user->fresh()->load('studentProfile'));
     }
 
-    public function show(string $id)
+    public function show(User $user)
     {
-        $user = user::findOrFail($id); //error returned if not found
-
-        return response()->json(new StudentResource($user), 200);
+        $this->authorize('view', $user);
+        return new StudentResource($user->load('studentProfile'));
     }
 
-    public function destroy(Request $request, User $user)
+    public function destroy(User $user)
     {
-        $this->authorize('delete', $user); // Check if the authenticated user can delete the given user
-
+        $this->authorize('delete', $user);
+        
+        if ($user->studentProfile) {
+            $user->studentProfile()->delete();
+        }
+        
         $user->delete();
-
-        return response()->json(['message' => 'Student deleted successfully'], 200);
+        
+        return response()->noContent();
     }
-    
 }
