@@ -98,19 +98,3 @@ php artisan queue:work
 Run all tests:
 php artisan test
 
----
-
-## Project Structure
-
-lms_api/
-├── app/                  # Application logic
-│   ├── Commands/          # Commands
-│   ├── Models/           # Eloquent models
-│   ├── Policies/         # Authorization policies
-│   ├── Http/             # Controllers and Resources
-│   ├── Mail/             # Mail
-│   └── Jobs/             # Queued jobs
-├── database/             # Migrations and factories
-├── routes/               # API routes
-├── tests/                # Feature and unit tests
-└── README.md             # Project documentation
